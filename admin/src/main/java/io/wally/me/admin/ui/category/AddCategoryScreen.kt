@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -24,6 +25,20 @@ fun AddCategoryScreen(
     var name by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        if (uiState is AdminViewModel.UiState.Success) {
+            val state = uiState as AdminViewModel.UiState.Success
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+        } else if (uiState is AdminViewModel.UiState.Error) {
+             val state = uiState as AdminViewModel.UiState.Error
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -34,8 +49,14 @@ fun AddCategoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Add Category") })
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+        if (uiState is AdminViewModel.UiState.Loading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -76,7 +97,12 @@ fun AddCategoryScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState !is AdminViewModel.UiState.Loading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = io.wally.me.admin.ui.theme.NeonPurple,
+                    contentColor = Color.Black
+                )
             ) {
                 Text("Add Category")
             }

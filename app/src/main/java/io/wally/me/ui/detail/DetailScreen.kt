@@ -33,17 +33,17 @@ fun DetailScreen(
             )
 
             // Overlay controls at bottom
-            Surface(
+            io.wally.me.ui.components.GlassBox(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(16.dp),
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                shape = MaterialTheme.shapes.medium
+                cornerRadius = 24.dp,
+                borderWidth = 1.dp
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(24.dp)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
@@ -52,15 +52,29 @@ fun DetailScreen(
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = io.wally.me.ui.theme.NeonPink,
+                            modifier = Modifier.size(32.dp)
                         )
                     }
 
-                    Button(onClick = { viewModel.incrementDownloadCount() /* TODO: Actual download */ }) {
-                        Text("Download")
+                    Button(
+                        onClick = { viewModel.incrementDownloadCount() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = io.wally.me.ui.theme.NeonBlue.copy(alpha = 0.8f)
+                        ),
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Text("Download", color = MaterialTheme.colorScheme.onPrimary)
                     }
-                    Button(onClick = { /* TODO: Set Wallpaper */ }) {
-                        Text("Set Wallpaper")
+
+                    Button(
+                        onClick = { /* TODO: Set Wallpaper */ },
+                         colors = ButtonDefaults.buttonColors(
+                            containerColor = io.wally.me.ui.theme.NeonPurple.copy(alpha = 0.8f)
+                        ),
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Text("Set", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }

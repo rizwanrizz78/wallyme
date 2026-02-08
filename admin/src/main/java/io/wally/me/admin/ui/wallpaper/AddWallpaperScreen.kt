@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -28,8 +29,24 @@ fun AddWallpaperScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
+    val uiState by viewModel.uiState.collectAsState()
     val categories by viewModel.categories.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        if (uiState is AdminViewModel.UiState.Success) {
+            val state = uiState as AdminViewModel.UiState.Success
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+            // Delay navigation to let snackbar show
+            // onWallpaperAdded()
+        } else if (uiState is AdminViewModel.UiState.Error) {
+            val state = uiState as AdminViewModel.UiState.Error
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+        }
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -40,8 +57,14 @@ fun AddWallpaperScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Add Wallpaper") })
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+        if (uiState is AdminViewModel.UiState.Loading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -108,7 +131,12 @@ fun AddWallpaperScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState !is AdminViewModel.UiState.Loading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = io.wally.me.admin.ui.theme.NeonBlue,
+                    contentColor = Color.Black
+                )
             ) {
                 Text("Add Wallpaper")
             }

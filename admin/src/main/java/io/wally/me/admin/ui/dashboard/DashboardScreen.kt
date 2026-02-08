@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -30,39 +31,56 @@ fun DashboardScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Admin Dashboard") })
+            TopAppBar(
+                title = { Text("Admin Dashboard", color = io.wally.me.admin.ui.theme.NeonBlue) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                )
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                if (selectedTab == 0) onAddWallpaperClick() else onAddCategoryClick()
-            }) {
+            FloatingActionButton(
+                onClick = {
+                    if (selectedTab == 0) onAddWallpaperClick() else onAddCategoryClick()
+                },
+                containerColor = io.wally.me.admin.ui.theme.NeonBlue,
+                contentColor = Color.Black
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = io.wally.me.admin.ui.theme.DeepSpaceBlack) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Text("Wallpapers") }
+                    icon = { Text("Wallpapers") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedTextColor = io.wally.me.admin.ui.theme.NeonBlue,
+                        indicatorColor = io.wally.me.admin.ui.theme.NeonBlue.copy(alpha = 0.2f)
+                    )
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Text("Categories") }
+                    icon = { Text("Categories") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedTextColor = io.wally.me.admin.ui.theme.NeonPurple,
+                        indicatorColor = io.wally.me.admin.ui.theme.NeonPurple.copy(alpha = 0.2f)
+                    )
                 )
             }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             if (selectedTab == 0) {
-                LazyColumn {
+                LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(wallpapers) { wallpaper ->
                         WallpaperListItem(wallpaper, onDelete = { viewModel.deleteWallpaper(wallpaper.id) })
                     }
                 }
             } else {
-                LazyColumn {
+                LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(categories) { category ->
                         CategoryListItem(category, onDelete = { viewModel.deleteCategory(category.id) })
                     }
@@ -74,39 +92,45 @@ fun DashboardScreen(
 
 @Composable
 fun WallpaperListItem(wallpaper: Wallpaper, onDelete: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(wallpaper.title) },
-        supportingContent = { Text(wallpaper.category) },
-        leadingContent = {
-            AsyncImage(
-                model = wallpaper.url,
-                contentDescription = null,
-                modifier = Modifier.size(56.dp)
-            )
-        },
-        trailingContent = {
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
-            }
-        }
-    )
+    io.wally.me.admin.ui.components.GlassBox(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = { Text(wallpaper.title, color = io.wally.me.admin.ui.theme.NeonBlue) },
+            supportingContent = { Text(wallpaper.category) },
+            leadingContent = {
+                AsyncImage(
+                    model = wallpaper.url,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp)
+                )
+            },
+            trailingContent = {
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = io.wally.me.admin.ui.theme.NeonPink)
+                }
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+        )
+    }
 }
 
 @Composable
 fun CategoryListItem(category: Category, onDelete: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(category.name) },
-        leadingContent = {
-            AsyncImage(
-                model = category.coverUrl,
-                contentDescription = null,
-                modifier = Modifier.size(56.dp)
-            )
-        },
-        trailingContent = {
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
-            }
-        }
-    )
+    io.wally.me.admin.ui.components.GlassBox(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = { Text(category.name, color = io.wally.me.admin.ui.theme.NeonPurple) },
+            leadingContent = {
+                AsyncImage(
+                    model = category.coverUrl,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp)
+                )
+            },
+            trailingContent = {
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = io.wally.me.admin.ui.theme.NeonPink)
+                }
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+        )
+    }
 }

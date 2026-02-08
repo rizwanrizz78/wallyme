@@ -24,32 +24,70 @@ class AdminViewModel @Inject constructor(
     val categories: StateFlow<List<Category>> = repository.getCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _uiState = kotlinx.coroutines.flow.MutableStateFlow<UiState>(UiState.Idle)
+    val uiState: StateFlow<UiState> = _uiState
+
+    sealed class UiState {
+        object Idle : UiState()
+        object Loading : UiState()
+        data class Success(val message: String) : UiState()
+        data class Error(val message: String) : UiState()
+    }
+
+    fun resetState() {
+        _uiState.value = UiState.Idle
+    }
+
     fun addWallpaper(title: String, category: String, imageData: ByteArray) {
         viewModelScope.launch {
+            _uiState.value = UiState.Loading
             val wallpaper = Wallpaper(
                 title = title,
                 category = category
             )
-            repository.addWallpaper(wallpaper, imageData)
+            val result = repository.addWallpaper(wallpaper, imageData)
+            if (result.isSuccess) {
+                _uiState.value = UiState.Success("Wallpaper added successfully")
+            } else {
+                _uiState.value = UiState.Error("Failed to add wallpaper: ${result.exceptionOrNull()?.message}")
+            }
         }
     }
 
     fun deleteWallpaper(id: String) {
         viewModelScope.launch {
-            repository.deleteWallpaper(id)
+            _uiState.value = UiState.Loading
+            val result = repository.deleteWallpaper(id)
+             if (result.isSuccess) {
+                _uiState.value = UiState.Success("Wallpaper deleted")
+            } else {
+                _uiState.value = UiState.Error("Failed to delete: ${result.exceptionOrNull()?.message}")
+            }
         }
     }
 
     fun addCategory(name: String, imageData: ByteArray) {
         viewModelScope.launch {
+            _uiState.value = UiState.Loading
             val category = Category(name = name)
-            repository.addCategory(category, imageData)
+            val result = repository.addCategory(category, imageData)
+             if (result.isSuccess) {
+                _uiState.value = UiState.Success("Category added successfully")
+            } else {
+                _uiState.value = UiState.Error("Failed to add category: ${result.exceptionOrNull()?.message}")
+            }
         }
     }
 
     fun deleteCategory(id: String) {
         viewModelScope.launch {
-            repository.deleteCategory(id)
+            _uiState.value = UiState.Loading
+            val result = repository.deleteCategory(id)
+             if (result.isSuccess) {
+                _uiState.value = UiState.Success("Category deleted")
+            } else {
+                _uiState.value = UiState.Error("Failed to delete: ${result.exceptionOrNull()?.message}")
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = DeepSpaceBlack,
     secondary = NeonPurple,
     onSecondary = LightText,
-    tertiary = Pink80,
+    tertiary = NeonPink,
     background = DeepSpaceBlack,
     surface = DarkSurface,
     onBackground = LightText,
@@ -29,9 +29,9 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    primary = NeonBlue,
+    secondary = NeonPurple,
+    tertiary = NeonPink,
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
