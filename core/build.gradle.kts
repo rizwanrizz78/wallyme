@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.auth.ktx)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)

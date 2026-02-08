@@ -1,6 +1,7 @@
 package io.wally.me.core.data.repository
 
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -22,8 +23,18 @@ import javax.inject.Singleton
 class FirebaseWallpaperRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
+    private val auth: FirebaseAuth,
     private val wallpaperDao: WallpaperDao
 ) : WallpaperRepository {
+
+    init {
+        // Automatically sign in anonymously if not already signed in
+        if (auth.currentUser == null) {
+             auth.signInAnonymously()
+                .addOnSuccessListener { Log.d("FirebaseRepo", "Signed in anonymously") }
+                .addOnFailureListener { e -> Log.e("FirebaseRepo", "Anonymous sign in failed", e) }
+        }
+    }
 
     override fun getWallpapers(): Flow<List<Wallpaper>> {
         return firestore.collection("wallpapers")
@@ -205,16 +216,20 @@ class FirebaseWallpaperRepository @Inject constructor(
 
     override suspend fun testFirestoreConnection(): Result<Unit> {
         return try {
+            val user = auth.currentUser
+            Log.d("FirebaseRepo", "Current User: ${user?.uid ?: "null"}")
+
             val testData = hashMapOf(
                 "timestamp" to System.currentTimeMillis(),
-                "message" to "Test connection from Admin App"
+                "message" to "Test connection from Admin App",
+                "uid" to (user?.uid ?: "anonymous")
             )
-            Log.d("FirebaseRepo", "Attempting to write test document...")
+            Log.d("FirebaseRepo", "Attempting to write test document to 'test_connection' collection...")
             firestore.collection("test_connection").add(testData).await()
             Log.d("FirebaseRepo", "Test document written successfully.")
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("FirebaseRepo", "Test connection failed: ${e.message}", e)
+            Log.e("FirebaseRepo", "Test connection failed. Exception: ${e::class.java.simpleName}, Message: ${e.message}", e)
             Result.failure(e)
         }
     }
