@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1072203230394",
+    "project_id": "wallyme",
+    "storage_bucket": "wallyme.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072203230394:android:8a7bd03459ac835bcfa683",
+        "android_client_info": {
+          "package_name": "io.wally.me"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOP0ZaTA-xem73y-udDaEbhxmzCgzp5xs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072203230394:android:dd52d76ea8bd2fe9cfa683",
+        "android_client_info": {
+          "package_name": "io.wally.me.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOP0ZaTA-xem73y-udDaEbhxmzCgzp5xs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
