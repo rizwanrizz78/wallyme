@@ -28,11 +28,31 @@ fun DashboardScreen(
     var selectedTab by remember { mutableStateOf(0) }
     val wallpapers by viewModel.wallpapers.collectAsState()
     val categories by viewModel.categories.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        if (uiState is AdminViewModel.UiState.Success) {
+            val state = uiState as AdminViewModel.UiState.Success
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+        } else if (uiState is AdminViewModel.UiState.Error) {
+            val state = uiState as AdminViewModel.UiState.Error
+            snackbarHostState.showSnackbar(state.message)
+            viewModel.resetState()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Admin Dashboard", color = io.wally.me.admin.ui.theme.NeonBlue) },
+                actions = {
+                    TextButton(onClick = { viewModel.testConnection() }) {
+                         Text("Test DB", color = io.wally.me.admin.ui.theme.NeonPink)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 )

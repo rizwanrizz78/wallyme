@@ -25,4 +25,7 @@ interface WallpaperRepository {
     fun isFavorite(id: String): Flow<Boolean>
     suspend fun addToFavorites(wallpaper: Wallpaper)
     suspend fun removeFromFavorites(wallpaper: Wallpaper)
+
+    // Debug
+    suspend fun testFirestoreConnection(): Result<Unit>
 }

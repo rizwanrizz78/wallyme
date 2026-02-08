@@ -90,4 +90,16 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
+
+    fun testConnection() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            val result = repository.testFirestoreConnection()
+            if (result.isSuccess) {
+                _uiState.value = UiState.Success("Firestore Connection Successful!")
+            } else {
+                _uiState.value = UiState.Error("Connection Failed: ${result.exceptionOrNull()?.message}")
+            }
+        }
+    }
 }

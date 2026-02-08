@@ -59,19 +59,26 @@ class FirebaseWallpaperRepository @Inject constructor(
             val fileName = "wallpapers/${UUID.randomUUID()}.jpg"
             val ref = storage.reference.child(fileName)
 
+            Log.d("FirebaseRepo", "Starting image upload for wallpaper: ${wallpaper.title}")
+
             // Upload image
             ref.putBytes(imageData).await()
             val downloadUrl = ref.downloadUrl.await().toString()
+
+            Log.d("FirebaseRepo", "Image uploaded successfully. URL: $downloadUrl")
 
             val newWallpaper = wallpaper.copy(
                 url = downloadUrl,
                 timestamp = System.currentTimeMillis()
             )
 
+            Log.d("FirebaseRepo", "Saving wallpaper to Firestore...")
             firestore.collection("wallpapers").add(newWallpaper).await()
+            Log.d("FirebaseRepo", "Wallpaper saved to Firestore.")
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("FirebaseRepo", "Error adding wallpaper", e)
+            Log.e("FirebaseRepo", "Error adding wallpaper. Message: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -110,21 +117,28 @@ class FirebaseWallpaperRepository @Inject constructor(
 
     override suspend fun addCategory(category: Category, imageData: ByteArray): Result<Unit> {
         return try {
-             val fileName = "categories/${UUID.randomUUID()}.jpg"
+            val fileName = "categories/${UUID.randomUUID()}.jpg"
             val ref = storage.reference.child(fileName)
+
+            Log.d("FirebaseRepo", "Starting image upload for category: ${category.name}")
 
             // Upload image
             ref.putBytes(imageData).await()
             val downloadUrl = ref.downloadUrl.await().toString()
 
+            Log.d("FirebaseRepo", "Image uploaded successfully. URL: $downloadUrl")
+
             val newCategory = category.copy(
                 coverUrl = downloadUrl
             )
 
+            Log.d("FirebaseRepo", "Saving category to Firestore...")
             firestore.collection("categories").add(newCategory).await()
+            Log.d("FirebaseRepo", "Category saved to Firestore.")
+
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("FirebaseRepo", "Error adding category", e)
+            Log.e("FirebaseRepo", "Error adding category. Message: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -187,5 +201,21 @@ class FirebaseWallpaperRepository @Inject constructor(
 
     override suspend fun removeFromFavorites(wallpaper: Wallpaper) {
         wallpaperDao.delete(wallpaper.toEntity())
+    }
+
+    override suspend fun testFirestoreConnection(): Result<Unit> {
+        return try {
+            val testData = hashMapOf(
+                "timestamp" to System.currentTimeMillis(),
+                "message" to "Test connection from Admin App"
+            )
+            Log.d("FirebaseRepo", "Attempting to write test document...")
+            firestore.collection("test_connection").add(testData).await()
+            Log.d("FirebaseRepo", "Test document written successfully.")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FirebaseRepo", "Test connection failed: ${e.message}", e)
+            Result.failure(e)
+        }
     }
 }
